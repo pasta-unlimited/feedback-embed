@@ -78,25 +78,34 @@ class MessageWidget {
     container.appendChild(buttonContainer);
   }
 
-  createWidgetContent() {
-    this.widgetContainer.innerHTML = `
-        <header class="widget__header">
-            <h3>Give feedback</h3>
-        </header>
-        <form>
-            <div class="form__field">
-                <label for="message">Feedback</label>
-                <textarea
-                id="message"
-                name="message"
-                placeholder="Enter your feedback"
-                rows="6"
-                ></textarea>
-            </div>
+  async createWidgetContent() {
 
-            <button>Send Feedback</button>
-        </form>
-    `;
+    await fetch('http://localhost:3000/feedbacks/js_form', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    }).then((response) => {
+      response.text().then((body)=> {
+        this.widgetContainer.innerHTML = body;
+        const csrfToken = document.querySelector("meta[name=csrf-token]").content;
+        const csrfParam = document.querySelector("meta[name=csrf-param]").content;
+
+        const feedbackForm = document.getElementById('feedback-form');
+        feedbackForm.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          const comment =  document.getElementById("comment").value;
+          const currentUrl = window.location.href;
+          const response = await fetch('http://localhost:3000/feedbacks.json', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', csrfParam: csrfToken },
+            body: JSON.stringify({comment: comment, location:currentUrl}),
+          });
+
+          const result = await response.json();
+          console.log(result)
+        });
+      })
+      }
+    );
   }
 
   injectStyles() {
