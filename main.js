@@ -96,7 +96,7 @@ class MessageWidget {
           const currentUrl = window.location.href;
           const response = await fetch('http://localhost:3000/feedbacks.json', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', csrfParam: csrfToken },
+            headers: { 'Content-Type': 'application/json', 'X-Csrf-Token': csrfToken },
             body: JSON.stringify({comment: comment, location:currentUrl}),
           });
 
